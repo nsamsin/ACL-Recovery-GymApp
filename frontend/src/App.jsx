@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { api } from "./lib/api";
+import { api, syncQueuedWrites } from "./lib/api";
 import LoginSetup from "./components/LoginSetup";
 import Dashboard from "./components/Dashboard";
 import SessionView from "./components/SessionView";
@@ -20,6 +20,14 @@ function ShareRoute({ token }) {
   }, [token]);
 
   const trend = (data?.healthLog || []).slice().reverse().map((h) => ({ date: h.date, pijn: h.pain, zwelling: h.swelling }));
+  const perExercise = Object.values(
+    (data?.sessionExercises || []).reduce((acc, row) => {
+      if (!acc[row.exercise_id]) acc[row.exercise_id] = { name: row.exercise_name, logs: 0, completed: 0 };
+      acc[row.exercise_id].logs += 1;
+      if (row.completed) acc[row.exercise_id].completed += 1;
+      return acc;
+    }, {})
+  );
 
   return (
     <main className="min-h-screen bg-slate-100 p-4">
@@ -44,6 +52,14 @@ function ShareRoute({ token }) {
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <div className="card">
+            <p className="mb-2 font-semibold">Progressie per oefening</p>
+            <ul className="space-y-1 text-sm">
+              {perExercise.slice(0, 12).map((e) => (
+                <li key={e.name}>{e.name}: {e.completed}/{e.logs} afgerond</li>
+              ))}
+            </ul>
+          </div>
         </div>
       ) : !error ? (
         <div className="card">Laden...</div>
@@ -58,6 +74,7 @@ function MainApp() {
   const [hasUser, setHasUser] = useState(!!localStorage.getItem("acl_has_user"));
   const [error, setError] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
+  const [actionBusy, setActionBusy] = useState("");
   const [tab, setTab] = useState("dashboard");
   const [exercises, setExercises] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -65,6 +82,7 @@ function MainApp() {
   const [shareData, setShareData] = useState(null);
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [sessionState, setSessionState] = useState({});
+  const [syncStatus, setSyncStatus] = useState("");
 
   useEffect(() => {
     const id = localStorage.getItem("acl_user_id");
@@ -75,6 +93,20 @@ function MainApp() {
       hydrate();
     }
     setAuthChecked(true);
+  }, []);
+
+  useEffect(() => {
+    const onOnline = async () => {
+      const res = await syncQueuedWrites();
+      if (res.synced > 0) {
+        setSyncStatus(`${res.synced} offline acties gesynchroniseerd`);
+        await hydrate();
+        setTimeout(() => setSyncStatus(""), 4000);
+      }
+    };
+    window.addEventListener("online", onOnline);
+    onOnline();
+    return () => window.removeEventListener("online", onOnline);
   }, []);
 
   async function hydrate() {
@@ -128,13 +160,20 @@ function MainApp() {
   }
 
   async function startSession() {
+    setActionBusy("Sessie starten...");
     try {
       const created = await api.createSession();
+      if (created.queued) {
+        setSyncStatus("Offline: sessie start is in wachtrij gezet");
+        return;
+      }
       setActiveSessionId(created.session.id);
       setTab("sessie");
       setError("");
     } catch (e) {
       setError(e.message);
+    } finally {
+      setActionBusy("");
     }
   }
 
@@ -147,52 +186,87 @@ function MainApp() {
 
   async function finishSession() {
     if (!activeSessionId) return;
+    setActionBusy("Sessie afronden...");
     try {
-      await Promise.all(
+      const logResults = await Promise.all(
         Object.entries(sessionState).map(([exercise_id, payload]) =>
           api.logSessionExercise(activeSessionId, { exercise_id, ...payload })
         )
       );
-      await api.finishSession(activeSessionId, { completed: true });
+      const finishRes = await api.finishSession(activeSessionId, { completed: true });
+      if (finishRes.queued || logResults.some((r) => r?.queued)) {
+        setSyncStatus("Offline: sessie-updates staan in wachtrij");
+      }
       setActiveSessionId(null);
       await hydrate();
       setTab("dashboard");
       setError("");
     } catch (e) {
       setError(e.message);
+    } finally {
+      setActionBusy("");
     }
   }
 
   async function saveHealth(payload) {
+    setActionBusy("Dagboek opslaan...");
     try {
-      await api.addHealthLog(payload);
+      const res = await api.addHealthLog(payload);
+      if (res.queued) setSyncStatus("Offline: dagboekentry in wachtrij");
       await hydrate();
       setTab("dashboard");
       setError("");
     } catch (e) {
       setError(e.message);
+    } finally {
+      setActionBusy("");
     }
   }
 
   async function loadShare() {
     if (!user?.share_token) return;
+    setActionBusy("Share data laden...");
     try {
       const data = await api.share(user.share_token);
       setShareData(data);
       setError("");
     } catch (e) {
       setError(e.message);
+    } finally {
+      setActionBusy("");
     }
   }
 
   async function updateName(name) {
     const res = await api.updateName(name);
+    if (res.queued) {
+      setSyncStatus("Offline: naamwijziging in wachtrij");
+      return;
+    }
     localStorage.setItem("acl_user_name", res.user.name);
     setUser((prev) => ({ ...prev, ...res.user }));
   }
 
   async function updatePin(currentPin, newPin) {
     await api.updatePin(currentPin, newPin);
+  }
+
+  async function createExercise(payload) {
+    const res = await api.createExercise(payload);
+    if (res.queued) setSyncStatus("Offline: oefening toevoegen in wachtrij");
+    await hydrate();
+  }
+
+  async function deleteExercise(id) {
+    const res = await api.deleteExercise(id);
+    if (res.queued) setSyncStatus("Offline: oefening verwijderen in wachtrij");
+    await hydrate();
+  }
+
+  async function reorderExercises(order) {
+    const res = await api.reorderExercises(order);
+    if (res.queued) setSyncStatus("Offline: volgorde in wachtrij");
+    await hydrate();
   }
 
   function exportJson() {
@@ -227,6 +301,8 @@ function MainApp() {
       </header>
 
       {error ? <div className="card mb-4 text-sm text-red-700">{error}</div> : null}
+      {actionBusy ? <div className="card mb-4 text-sm text-slate-700">{actionBusy}</div> : null}
+      {syncStatus ? <div className="card mb-4 text-sm text-emerald-700">{syncStatus}</div> : null}
 
       {tab === "dashboard" && (
         <Dashboard
@@ -252,9 +328,13 @@ function MainApp() {
         <Settings
           user={user}
           shareToken={user.share_token}
+          exercises={orderedExercises}
           onExport={exportJson}
           onUpdateName={updateName}
           onUpdatePin={updatePin}
+          onCreateExercise={createExercise}
+          onDeleteExercise={deleteExercise}
+          onReorderExercises={reorderExercises}
         />
       )}
 
