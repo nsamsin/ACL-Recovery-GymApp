@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
@@ -11,8 +12,8 @@ export default {
         blokb: "#1f2937",
         blokc: "#0f766e",
         cooldown: "#4f46e5",
-        "surface-secondary": "#f2f2f7",
-        "surface-tertiary": "#e5e5ea",
+        "surface-secondary": "var(--bg-secondary)",
+        "surface-tertiary": "var(--bg-tertiary)",
         "ios-red": "#ff3b30",
         "ios-green": "#34c759",
         "ios-orange": "#ff9500",
@@ -20,10 +21,10 @@ export default {
       },
       boxShadow: {
         "ios-sm": "0 1px 3px rgba(0,0,0,0.08)",
-        ios: "0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)",
+        ios: "var(--card-shadow)",
         "ios-lg": "0 4px 16px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.04)",
         "ios-xl": "0 8px 30px rgba(0,0,0,0.12)",
-        "ios-nav": "0 -1px 12px rgba(0,0,0,0.06)"
+        "ios-nav": "var(--nav-shadow)"
       },
       borderRadius: {
         ios: "12px",
