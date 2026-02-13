@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme variables ──────────────────────────────── */
+:root {
+  color-scheme: light;
+  --bg-primary: #f2f2f7;
+  --bg-card: #ffffff;
+  --bg-secondary: #f2f2f7;
+  --bg-tertiary: #e5e5ea;
+  --bg-fill: #e5e5ea;
+  --text-primary: #1c1c1e;
+  --text-secondary: #8e8e93;
+  --glass-nav: rgba(249, 249, 249, 0.85);
+  --glass-nav-border: rgba(0, 0, 0, 0.08);
+  --glass-header: rgba(26, 39, 68, 0.88);
+  --chart-grid: #f0f0f5;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --nav-shadow: 0 -1px 12px rgba(0,0,0,0.06);
+  --toggle-track: #e5e5ea;
+  --thumb-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);
+  --input-border-focus: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg-primary: #000000;
+  --bg-card: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --bg-tertiary: #3a3a3c;
+  --bg-fill: #39393d;
+  --text-primary: #f5f5f7;
+  --text-secondary: #8e8e93;
+  --glass-nav: rgba(28, 28, 30, 0.88);
+  --glass-nav-border: rgba(255, 255, 255, 0.06);
+  --glass-header: rgba(18, 18, 20, 0.92);
+  --chart-grid: #2c2c2e;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.35), 0 0 0 0.5px rgba(255,255,255,0.06);
+  --nav-shadow: 0 -1px 0 rgba(255,255,255,0.06);
+  --toggle-track: #39393d;
+  --thumb-shadow: 0 2px 4px rgba(0,0,0,0.4), 0 0 1px rgba(0,0,0,0.3);
+  --input-border-focus: 0 0 0 3px rgba(0, 122, 255, 0.25);
+}
+
 /* ── iOS base ─────────────────────────────────────── */
 html {
   -webkit-font-smoothing: antialiased;
@@ -12,8 +53,8 @@ html {
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  background: #f2f2f7;
-  color: #1c1c1e;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   padding-top: env(safe-area-inset-top);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -23,7 +64,9 @@ body {
 
 /* ── Card ─────────────────────────────────────────── */
 .card {
-  @apply rounded-ios-lg bg-white p-4 shadow-ios;
+  @apply rounded-ios-lg p-4 shadow-ios;
+  background: var(--bg-card);
+  color: var(--text-primary);
   border: none;
   transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
@@ -71,30 +114,35 @@ body {
 
 /* ── Glass nav ────────────────────────────────────── */
 .glass-nav {
-  background: rgba(249, 249, 249, 0.85);
+  background: var(--glass-nav);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-top: 0.5px solid var(--glass-nav-border);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ── Glass header ─────────────────────────────────── */
 .glass-header {
-  background: rgba(26, 39, 68, 0.88);
+  background: var(--glass-header);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 /* ── iOS form input ───────────────────────────────── */
 .ios-input {
-  @apply w-full rounded-ios bg-surface-secondary px-4 py-3 text-[15px];
+  @apply w-full rounded-ios px-4 py-3 text-[15px];
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   border: 1.5px solid transparent;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
+.ios-input::placeholder {
+  color: var(--text-secondary);
+}
 .ios-input:focus {
   border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  box-shadow: var(--input-border-focus);
 }
 
 /* ── iOS toggle switch ────────────────────────────── */
@@ -117,7 +165,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 15.5px;
-  background: #e5e5ea;
+  background: var(--toggle-track);
   transition: background 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .ios-toggle input:checked + .toggle-track {
@@ -132,7 +180,7 @@ body {
   height: 27px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--thumb-shadow);
   transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .ios-toggle input:checked + .toggle-track::after {
@@ -146,7 +194,7 @@ body {
   appearance: none;
   height: 4px;
   border-radius: 2px;
-  background: #e5e5ea;
+  background: var(--bg-fill);
   outline: none;
 }
 .ios-range::-webkit-slider-thumb {
@@ -155,7 +203,7 @@ body {
   height: 28px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--thumb-shadow);
   cursor: pointer;
 }
 .ios-range::-moz-range-thumb {
@@ -164,13 +212,15 @@ body {
   border-radius: 50%;
   background: white;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--thumb-shadow);
   cursor: pointer;
 }
 
 /* ── iOS select ───────────────────────────────────── */
 .ios-select {
-  @apply w-full rounded-ios bg-surface-secondary px-4 py-3 text-[15px];
+  @apply w-full rounded-ios px-4 py-3 text-[15px];
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   border: 1.5px solid transparent;
   outline: none;
   appearance: none;
@@ -183,7 +233,7 @@ body {
 }
 .ios-select:focus {
   border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  box-shadow: var(--input-border-focus);
 }
 
 /* ── Tab content fade ─────────────────────────────── */
@@ -207,7 +257,7 @@ body {
 /* ── Progress bar ─────────────────────────────────── */
 .progress-bar {
   @apply h-2 rounded-full overflow-hidden;
-  background: #e5e5ea;
+  background: var(--bg-fill);
 }
 .progress-bar-fill {
   @apply h-full rounded-full;
@@ -218,11 +268,11 @@ body {
 /* ── Recharts overrides ───────────────────────────── */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: #f0f0f5;
+  stroke: var(--chart-grid);
 }
 .recharts-text {
   font-size: 11px;
-  fill: #8e8e93;
+  fill: var(--text-secondary);
 }
 .recharts-tooltip-wrapper .recharts-default-tooltip {
   border-radius: 10px !important;
@@ -230,4 +280,6 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
   padding: 8px 12px !important;
   font-size: 13px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
