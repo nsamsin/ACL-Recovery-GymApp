@@ -2,11 +2,11 @@
 node_modules/
 
 # Frontend build
-/acl-rehab-app/frontend/dist/
+frontend/dist/
 
 # Worker build/cache
-/acl-rehab-app/worker/.wrangler/
-/acl-rehab-app/worker/dist/
+worker/.wrangler/
+worker/dist/
 
 # Logs
 npm-debug.log*
