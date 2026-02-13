@@ -38,7 +38,7 @@ jobs:
 
       - name: Deploy Worker
         working-directory: worker
-        run: npx wrangler deploy
+        run: npx wrangler@4 deploy
 
       - name: Install Frontend deps
         working-directory: frontend
@@ -50,4 +50,4 @@ jobs:
 
       - name: Deploy Pages
         working-directory: frontend
-        run: npx wrangler pages deploy dist --project-name=acl-rehab-app
+        run: npx wrangler@4 pages deploy dist --project-name=acl-rehab-app
