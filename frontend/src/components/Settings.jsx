@@ -29,8 +29,6 @@ export default function Settings({
     is_timed: false
   });
 
-  const link = `${window.location.origin}/share/${shareToken}`;
-
   const ordered = useMemo(() => [...exercises].sort((a, b) => a.sort_order - b.sort_order), [exercises]);
 
   async function onMove(id, dir) {
@@ -48,10 +46,10 @@ export default function Settings({
       <div className="card">
         <h3 className="font-semibold">Instellingen</h3>
         <label className="mt-3 block">
-          <span className="text-sm font-semibold">Naam wijzigen</span>
-          <input className="mt-1 w-full rounded border p-2" value={name} onChange={(e) => setName(e.target.value)} />
+          <span className="text-[13px] font-semibold text-[#8e8e93]">Naam wijzigen</span>
+          <input className="ios-input mt-1" value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <button className="touch-btn mt-2 w-full bg-slate-900 text-white" onClick={async () => {
+        <button className="btn-primary mt-3" onClick={async () => {
           try {
             await onUpdateName(name);
             setMsg("Naam bijgewerkt");
@@ -63,9 +61,9 @@ export default function Settings({
 
       <div className="card">
         <h3 className="font-semibold">PIN wijzigen</h3>
-        <input className="mt-2 w-full rounded border p-2" type="password" inputMode="numeric" placeholder="Huidige PIN" value={currentPin} onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, "").slice(0, 4))} />
-        <input className="mt-2 w-full rounded border p-2" type="password" inputMode="numeric" placeholder="Nieuwe PIN" value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))} />
-        <button className="touch-btn mt-2 w-full bg-slate-900 text-white" onClick={async () => {
+        <input className="ios-input mt-2" type="password" inputMode="numeric" placeholder="Huidige PIN" value={currentPin} onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, "").slice(0, 4))} />
+        <input className="ios-input mt-2" type="password" inputMode="numeric" placeholder="Nieuwe PIN" value={newPin} onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))} />
+        <button className="btn-primary mt-3" onClick={async () => {
           try {
             await onUpdatePin(currentPin, newPin);
             setCurrentPin("");
@@ -78,22 +76,16 @@ export default function Settings({
       </div>
 
       <div className="card">
-        <p className="font-semibold">Deellink</p>
-        <p className="break-all text-sm">{link}</p>
-        <button className="touch-btn mt-2 w-full bg-slate-200" onClick={() => navigator.clipboard.writeText(link)}>Kopieer deellink</button>
-      </div>
-
-      <div className="card">
         <h3 className="font-semibold">Schema aanpassen</h3>
         <div className="mt-2 space-y-2">
           {ordered.map((e) => (
-            <div key={e.id} className="rounded border p-2 text-sm">
-              <div className="font-semibold">{e.name}</div>
-              <div className="text-slate-500">{e.category} · {e.default_sets}x{e.default_reps}</div>
+            <div key={e.id} className="rounded-ios bg-surface-secondary p-3">
+              <div className="font-semibold text-[15px]">{e.name}</div>
+              <div className="text-[13px] text-[#8e8e93]">{e.category} · {e.default_sets}x{e.default_reps}</div>
               <div className="mt-2 grid grid-cols-3 gap-1">
-                <button className="touch-btn bg-slate-200 text-xs" onClick={() => onMove(e.id, -1)}>Omhoog</button>
-                <button className="touch-btn bg-slate-200 text-xs" onClick={() => onMove(e.id, 1)}>Omlaag</button>
-                <button className="touch-btn bg-red-100 text-xs" onClick={async () => {
+                <button className="btn-secondary text-[13px]" onClick={() => onMove(e.id, -1)}>Omhoog</button>
+                <button className="btn-secondary text-[13px]" onClick={() => onMove(e.id, 1)}>Omlaag</button>
+                <button className="touch-btn bg-ios-red/10 text-ios-red text-[13px]" onClick={async () => {
                   await onDeleteExercise(e.id);
                   setMsg("Oefening verwijderd");
                 }}>Verwijder</button>
@@ -105,12 +97,12 @@ export default function Settings({
 
       <div className="card">
         <h3 className="font-semibold">Oefening toevoegen</h3>
-        <input className="mt-2 w-full rounded border p-2" placeholder="ID (bijv. c_side_plank)" value={newEx.id} onChange={(e) => setNewEx({ ...newEx, id: e.target.value.replace(/\s+/g, "_").toLowerCase() })} />
-        <input className="mt-2 w-full rounded border p-2" placeholder="Naam" value={newEx.name} onChange={(e) => setNewEx({ ...newEx, name: e.target.value })} />
-        <select className="mt-2 w-full rounded border p-2" value={newEx.category} onChange={(e) => setNewEx({ ...newEx, category: e.target.value })}>
+        <input className="ios-input mt-2" placeholder="ID (bijv. c_side_plank)" value={newEx.id} onChange={(e) => setNewEx({ ...newEx, id: e.target.value.replace(/\s+/g, "_").toLowerCase() })} />
+        <input className="ios-input mt-2" placeholder="Naam" value={newEx.name} onChange={(e) => setNewEx({ ...newEx, name: e.target.value })} />
+        <select className="ios-select mt-2" value={newEx.category} onChange={(e) => setNewEx({ ...newEx, category: e.target.value })}>
           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
-        <button className="touch-btn mt-2 w-full bg-accent text-white" onClick={async () => {
+        <button className="btn-primary mt-3" onClick={async () => {
           try {
             await onCreateExercise(newEx);
             setNewEx({ ...newEx, id: "", name: "" });
@@ -121,9 +113,9 @@ export default function Settings({
         }} disabled={!newEx.id || !newEx.name}>Toevoegen</button>
       </div>
 
-      {msg ? <div className="card text-sm">{msg}</div> : null}
+      {msg ? <div className="rounded-ios bg-ios-green/10 px-4 py-3 text-sm text-ios-green">{msg}</div> : null}
 
-      <button className="touch-btn w-full bg-slate-900 text-white" onClick={onExport}>Data exporteren (JSON)</button>
+      <button className="btn-primary" onClick={onExport}>Data exporteren (JSON)</button>
     </div>
   );
 }

@@ -51,11 +51,11 @@ export default function Timer({ defaultText }) {
   const ss = String(secondsLeft % 60).padStart(2, "0");
 
   return (
-    <div className="rounded-xl border border-slate-300 bg-slate-50 p-3">
-      <p className="text-center text-4xl font-bold">{mm}:{ss}</p>
+    <div className="card bg-surface-secondary">
+      <p className="text-center text-5xl font-bold tabular-nums">{mm}:{ss}</p>
       <div className="mt-3 grid grid-cols-3 gap-2">
         <button
-          className="touch-btn bg-accent text-white"
+          className="btn-primary"
           onClick={() => {
             if (!running) targetRef.current = Date.now() + secondsLeft * 1000;
             setRunning((v) => !v);
@@ -64,7 +64,7 @@ export default function Timer({ defaultText }) {
           {running ? "Pauze" : "Start"}
         </button>
         <button
-          className="touch-btn bg-slate-300"
+          className="btn-secondary"
           onClick={() => {
             setSecondsLeft(initial);
             setRunning(false);
@@ -72,12 +72,12 @@ export default function Timer({ defaultText }) {
         >
           Reset
         </button>
-        <button className="touch-btn bg-slate-300" onClick={() => {
+        <button className="btn-secondary" onClick={() => {
           if (targetRef.current) targetRef.current -= 15000;
           setSecondsLeft((s) => Math.max(0, s - 15));
         }}>-15s</button>
       </div>
-      <button className="touch-btn mt-2 w-full bg-slate-200" onClick={() => {
+      <button className="btn-secondary mt-2" onClick={() => {
         if (targetRef.current) targetRef.current += 15000;
         setSecondsLeft((s) => s + 15);
       }}>+15s</button>

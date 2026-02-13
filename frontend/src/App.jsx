@@ -9,7 +9,55 @@ import Progress from "./components/Progress";
 import ShareView from "./components/ShareView";
 import Settings from "./components/Settings";
 
-const tabs = ["dashboard", "sessie", "dagboek", "progressie", "delen", "settings"];
+const tabConfig = [
+  { key: "dashboard", label: "Home", icon: "house" },
+  { key: "sessie", label: "Sessie", icon: "dumbbell" },
+  { key: "dagboek", label: "Dagboek", icon: "book" },
+  { key: "progressie", label: "Progressie", icon: "chart" },
+  { key: "meer", label: "Meer", icon: "gear" }
+];
+
+function TabIcon({ name, active }) {
+  const color = active ? "#007aff" : "#8e8e93";
+  const props = { width: 22, height: 22, fill: "none", stroke: color, strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" };
+
+  switch (name) {
+    case "house":
+      return (
+        <svg {...props} viewBox="0 0 24 24">
+          <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" />
+        </svg>
+      );
+    case "dumbbell":
+      return (
+        <svg {...props} viewBox="0 0 24 24">
+          <path d="M6.5 6.5a2 2 0 00-2 2v7a2 2 0 004 0v-7a2 2 0 00-2-2zM17.5 6.5a2 2 0 00-2 2v7a2 2 0 004 0v-7a2 2 0 00-2-2zM8.5 12h7M2 10v4M22 10v4" />
+        </svg>
+      );
+    case "book":
+      return (
+        <svg {...props} viewBox="0 0 24 24">
+          <path d="M4 4h5a3 3 0 013 3v13a2 2 0 00-2-2H4zM20 4h-5a3 3 0 00-3 3v13a2 2 0 012-2h6z" />
+        </svg>
+      );
+    case "chart":
+      return (
+        <svg {...props} viewBox="0 0 24 24">
+          <path d="M3 3v18h18" />
+          <path d="M7 16l4-5 4 3 5-7" />
+        </svg>
+      );
+    case "gear":
+      return (
+        <svg {...props} viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
 
 function ShareRoute({ token }) {
   const [data, setData] = useState(null);
@@ -31,8 +79,8 @@ function ShareRoute({ token }) {
   );
 
   return (
-    <main className="min-h-screen bg-slate-100 p-4">
-      <header className="mb-4 rounded-2xl bg-primary p-4 text-white">
+    <main className="min-h-screen bg-surface-secondary p-4">
+      <header className="glass-header mb-4 rounded-ios-lg p-4 text-white">
         <h1 className="text-lg font-bold">ACL Revalidatie - Read-only</h1>
       </header>
       {error && <div className="card text-red-700">{error}</div>}
@@ -48,8 +96,8 @@ function ShareRoute({ token }) {
                 <XAxis dataKey="date" />
                 <YAxis domain={[0, 10]} />
                 <Tooltip />
-                <Line type="monotone" dataKey="pijn" stroke="#ef4444" />
-                <Line type="monotone" dataKey="zwelling" stroke="#f59e0b" />
+                <Line type="monotone" dataKey="pijn" stroke="#ff3b30" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="zwelling" stroke="#ff9500" strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -77,12 +125,12 @@ function ShareRoute({ token }) {
                         <XAxis dataKey="date" hide />
                         <YAxis domain={["dataMin - 1", "dataMax + 1"]} hide />
                         <Tooltip />
-                        <Line type="monotone" dataKey="weight" stroke="#3b82f6" dot={false} strokeWidth={2} />
+                        <Line type="monotone" dataKey="weight" stroke="#007aff" dot={false} strokeWidth={2.5} />
                       </LineChart>
                     </ResponsiveContainer>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#8e8e93]">
                       {first.weight} kg → {latest.weight} kg
-                      {diff !== 0 && <span className={diff > 0 ? " text-green-600" : " text-red-600"}> ({diff > 0 ? "+" : ""}{diff} kg)</span>}
+                      {diff !== 0 && <span className={diff > 0 ? " text-ios-green" : " text-ios-red"}> ({diff > 0 ? "+" : ""}{diff} kg)</span>}
                     </p>
                   </div>
                 );
@@ -310,6 +358,14 @@ function MainApp() {
     URL.revokeObjectURL(url);
   }
 
+  const tabTitle = {
+    dashboard: "Home",
+    sessie: "Sessie",
+    dagboek: "Dagboek",
+    progressie: "Progressie",
+    meer: "Meer"
+  };
+
   if (!authChecked) return null;
   if (!user) {
     return (
@@ -324,59 +380,85 @@ function MainApp() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 p-3 pb-24">
-      <header className="mb-4 rounded-2xl bg-primary p-4 text-white">
-        <h1 className="text-lg font-bold">ACL Revalidatie Gym App</h1>
+    <main className="min-h-screen bg-surface-secondary pb-24">
+      <header className="glass-header sticky top-0 z-30 px-4 py-3 text-white text-center">
+        <h1 className="text-[17px] font-semibold">{tabTitle[tab] || "ACL Revalidatie"}</h1>
       </header>
 
-      {error ? <div className="card mb-4 text-sm text-red-700">{error}</div> : null}
-      {actionBusy ? <div className="card mb-4 text-sm text-slate-700">{actionBusy}</div> : null}
-      {syncStatus ? <div className="card mb-4 text-sm text-emerald-700">{syncStatus}</div> : null}
+      <div className="p-4 space-y-3">
+        {error && (
+          <div className="flex items-center gap-2 rounded-ios bg-ios-red/10 px-4 py-3 text-sm text-ios-red">
+            <span>{error}</span>
+          </div>
+        )}
+        {actionBusy && (
+          <div className="flex items-center gap-2 rounded-ios bg-ios-blue/10 px-4 py-3 text-sm text-ios-blue">
+            <span>{actionBusy}</span>
+          </div>
+        )}
+        {syncStatus && (
+          <div className="flex items-center gap-2 rounded-ios bg-ios-green/10 px-4 py-3 text-sm text-ios-green">
+            <span>{syncStatus}</span>
+          </div>
+        )}
 
-      {tab === "dashboard" && (
-        <Dashboard
-          user={user}
-          sessions={sessions}
-          healthLog={healthLog}
-          onStartSession={startSession}
-          onOpenHealth={() => setTab("dagboek")}
-        />
-      )}
-      {tab === "sessie" && (
-        <SessionView
-          exercises={orderedExercises}
-          sessionState={sessionState}
-          onChangeExercise={onChangeExercise}
-          onFinish={finishSession}
-        />
-      )}
-      {tab === "dagboek" && <HealthLog onSave={saveHealth} />}
-      {tab === "progressie" && <Progress sessions={sessions} healthLog={healthLog} exercises={orderedExercises} />}
-      {tab === "delen" && <ShareView shareToken={user.share_token} shareData={shareData} onLoadShare={loadShare} />}
-      {tab === "settings" && (
-        <Settings
-          user={user}
-          shareToken={user.share_token}
-          exercises={orderedExercises}
-          onExport={exportJson}
-          onUpdateName={updateName}
-          onUpdatePin={updatePin}
-          onCreateExercise={createExercise}
-          onDeleteExercise={deleteExercise}
-          onReorderExercises={reorderExercises}
-        />
-      )}
+        <div className="tab-content" key={tab}>
+          {tab === "dashboard" && (
+            <Dashboard
+              user={user}
+              sessions={sessions}
+              healthLog={healthLog}
+              onStartSession={startSession}
+              onOpenHealth={() => setTab("dagboek")}
+            />
+          )}
+          {tab === "sessie" && (
+            <SessionView
+              exercises={orderedExercises}
+              sessionState={sessionState}
+              onChangeExercise={onChangeExercise}
+              onFinish={finishSession}
+            />
+          )}
+          {tab === "dagboek" && <HealthLog onSave={saveHealth} />}
+          {tab === "progressie" && <Progress sessions={sessions} healthLog={healthLog} exercises={orderedExercises} />}
+          {tab === "meer" && (
+            <div className="space-y-4">
+              <ShareView shareToken={user.share_token} shareData={shareData} onLoadShare={loadShare} />
+              <Settings
+                user={user}
+                shareToken={user.share_token}
+                exercises={orderedExercises}
+                onExport={exportJson}
+                onUpdateName={updateName}
+                onUpdatePin={updatePin}
+                onCreateExercise={createExercise}
+                onDeleteExercise={deleteExercise}
+                onReorderExercises={reorderExercises}
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 mx-auto grid max-w-xl grid-cols-6 gap-1 border-t bg-white p-2">
-        {tabs.map((t) => (
-          <button
-            key={t}
-            className={`touch-btn text-xs ${tab === t ? "bg-accent text-white" : "bg-slate-200"}`}
-            onClick={() => setTab(t)}
-          >
-            {t}
-          </button>
-        ))}
+      <nav className="glass-nav fixed bottom-0 left-0 right-0 z-30 shadow-ios-nav">
+        <div className="mx-auto grid max-w-xl grid-cols-5 px-2 pt-1">
+          {tabConfig.map((t) => {
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                className="flex flex-col items-center gap-0.5 py-1 bg-transparent border-none"
+                onClick={() => setTab(t.key)}
+              >
+                <TabIcon name={t.icon} active={active} />
+                <span className={`text-[10px] font-medium ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`}>
+                  {t.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </nav>
     </main>
   );

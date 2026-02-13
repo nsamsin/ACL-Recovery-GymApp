@@ -13,21 +13,33 @@ export default function HealthLog({ onSave }) {
 
   return (
     <div className="card space-y-4">
-      <label className="block"><span className="text-sm font-semibold">Datum</span><input className="mt-1 w-full rounded border p-2" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label>
+      <label className="block">
+        <span className="text-[13px] font-semibold text-[#8e8e93]">Datum</span>
+        <input className="ios-input mt-1" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+      </label>
       {[
         ["swelling", "Zwelling"],
         ["pain", "Pijn"],
         ["stiffness", "Stijfheid"]
       ].map(([key, label]) => (
         <label key={key} className="block">
-          <span className="text-sm font-semibold">{label}: {form[key]}/10</span>
-          <input type="range" min="0" max="10" value={form[key]} onChange={(e) => setForm({ ...form, [key]: Number(e.target.value) })} className="w-full" />
+          <span className="text-[13px] font-semibold text-[#8e8e93]">{label}: {form[key]}/10</span>
+          <input type="range" min="0" max="10" value={form[key]} onChange={(e) => setForm({ ...form, [key]: Number(e.target.value) })} className="ios-range mt-2" />
         </label>
       ))}
-      <label className="flex items-center gap-2"><input type="checkbox" checked={form.rom_extension} onChange={(e) => setForm({ ...form, rom_extension: e.target.checked })} /> Volle extensie bereikt</label>
-      <label className="block"><span className="text-sm font-semibold">Flexie: {form.rom_flexion_degrees}°</span><input type="range" min="0" max="150" value={form.rom_flexion_degrees} onChange={(e) => setForm({ ...form, rom_flexion_degrees: Number(e.target.value) })} className="w-full" /></label>
-      <textarea className="w-full rounded border p-2" placeholder="Notities" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-      <button className="touch-btn w-full bg-accent text-white" onClick={() => onSave(form)}>Opslaan</button>
+      <div className="flex items-center justify-between">
+        <span className="text-[15px]">Volle extensie bereikt</span>
+        <label className="ios-toggle">
+          <input type="checkbox" checked={form.rom_extension} onChange={(e) => setForm({ ...form, rom_extension: e.target.checked })} />
+          <span className="toggle-track" />
+        </label>
+      </div>
+      <label className="block">
+        <span className="text-[13px] font-semibold text-[#8e8e93]">Flexie: {form.rom_flexion_degrees}°</span>
+        <input type="range" min="0" max="150" value={form.rom_flexion_degrees} onChange={(e) => setForm({ ...form, rom_flexion_degrees: Number(e.target.value) })} className="ios-range mt-2" />
+      </label>
+      <textarea className="ios-input" placeholder="Notities" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} />
+      <button className="btn-primary" onClick={() => onSave(form)}>Opslaan</button>
     </div>
   );
 }

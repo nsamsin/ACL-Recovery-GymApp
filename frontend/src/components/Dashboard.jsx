@@ -12,22 +12,19 @@ function nextPlannedSessionLabel() {
 }
 
 function workoutStreak(sessions) {
-  const plannedDays = [1, 3, 5]; // Mon, Wed, Fri
+  const plannedDays = [1, 3, 5];
   const sessionDates = new Set(sessions.map((s) => s.date));
   if (!sessionDates.size) return 0;
 
-  // Walk backwards through planned workout days starting from today
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   let streak = 0;
   let d = new Date(today);
 
-  // Rewind to the most recent planned day (today or earlier)
   while (!plannedDays.includes(d.getDay())) {
     d.setDate(d.getDate() - 1);
   }
 
-  // If the most recent planned day is today and no session yet, start from previous planned day
   const todayStr = today.toISOString().slice(0, 10);
   const latestStr = d.toISOString().slice(0, 10);
   if (latestStr === todayStr && !sessionDates.has(todayStr)) {
@@ -37,12 +34,10 @@ function workoutStreak(sessions) {
     }
   }
 
-  // Count consecutive planned days with sessions
   for (let i = 0; i < 100; i += 1) {
     const dateStr = d.toISOString().slice(0, 10);
     if (!sessionDates.has(dateStr)) break;
     streak += 1;
-    // Move to previous planned day
     d.setDate(d.getDate() - 1);
     while (!plannedDays.includes(d.getDay())) {
       d.setDate(d.getDate() - 1);
@@ -63,27 +58,34 @@ export default function Dashboard({ user, sessions, healthLog, onStartSession, o
 
   const streak = workoutStreak(sessions);
   const last = healthLog[0];
-  const riskColor = !last ? "bg-slate-200" : last.pain <= 3 ? "bg-green-200" : last.pain <= 6 ? "bg-orange-200" : "bg-red-200";
+  const riskBg = !last ? "bg-surface-tertiary" : last.pain <= 3 ? "bg-ios-green/10" : last.pain <= 6 ? "bg-ios-orange/10" : "bg-ios-red/10";
+  const riskText = !last ? "text-[#8e8e93]" : last.pain <= 3 ? "text-ios-green" : last.pain <= 6 ? "text-ios-orange" : "text-ios-red";
 
   return (
-    <div className="space-y-4">
+    <div className="animate-stagger space-y-4">
       <div className="card">
         <h2 className="text-xl font-bold">Welkom, {user.name}</h2>
-        <p className="text-sm text-slate-600">Volgende sessie: {nextPlannedSessionLabel()}</p>
+        <p className="text-[13px] text-[#8e8e93]">Volgende sessie: {nextPlannedSessionLabel()}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="card"><p className="text-sm text-slate-500">Sessies deze week</p><p className="text-2xl font-bold">{thisWeek}</p></div>
-        <div className="card"><p className="text-sm text-slate-500">Streak</p><p className="text-2xl font-bold">{streak} dagen</p></div>
+        <div className="card">
+          <p className="text-[13px] text-[#8e8e93]">Sessies deze week</p>
+          <p className="text-[28px] font-bold">{thisWeek}</p>
+        </div>
+        <div className="card">
+          <p className="text-[13px] text-[#8e8e93]">Streak</p>
+          <p className="text-[28px] font-bold">{streak} <span className="text-[17px] font-normal">dagen</span></p>
+        </div>
       </div>
 
-      <div className={`card ${riskColor}`}>
-        <p className="text-sm">Laatste pijn/zwelling</p>
+      <div className={`card ${riskBg}`}>
+        <p className={`text-[13px] ${riskText}`}>Laatste pijn/zwelling</p>
         {last ? <p className="font-semibold">Pijn {last.pain}/10 · Zwelling {last.swelling}/10</p> : <p>Nog geen dagboekdata</p>}
       </div>
 
-      <button className="touch-btn w-full bg-accent text-white" onClick={onStartSession}>Start Sessie</button>
-      <button className="touch-btn w-full bg-primary text-white" onClick={onOpenHealth}>Dagboek invullen</button>
+      <button className="btn-primary" onClick={onStartSession}>Start Sessie</button>
+      <button className="btn-secondary" onClick={onOpenHealth}>Dagboek invullen</button>
     </div>
   );
 }

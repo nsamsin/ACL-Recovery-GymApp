@@ -16,12 +16,12 @@ export default function SessionView({ exercises, sessionState, onChangeExercise,
     <div className="space-y-4">
       <div className="card">
         <p className="font-semibold">Voortgang: {completed}/{exercises.length} oefeningen voltooid</p>
-        <div className="mt-2 h-2 rounded bg-slate-200 overflow-hidden">
-          <div className="h-full bg-accent" style={{ width: `${(completed / Math.max(exercises.length, 1)) * 100}%` }} />
+        <div className="progress-bar mt-2">
+          <div className="progress-bar-fill" style={{ width: `${(completed / Math.max(exercises.length, 1)) * 100}%` }} />
         </div>
       </div>
       {categories.map((c) => (
-        <section key={c.key} className={`rounded-2xl border p-3 ${c.color}`}>
+        <section key={c.key} className={`rounded-ios-lg border-l-4 p-3 shadow-ios-sm ${c.color}`}>
           <h3 className="mb-3 font-bold">{c.label}</h3>
           <div className="space-y-3">
             {exercises.filter((e) => e.category === c.key).map((exercise) => {
@@ -39,7 +39,7 @@ export default function SessionView({ exercises, sessionState, onChangeExercise,
           </div>
         </section>
       ))}
-      <button className="touch-btn w-full bg-primary text-white" onClick={onFinish}>Sessie afronden</button>
+      <button className="btn-primary" onClick={onFinish}>Sessie afronden</button>
     </div>
   );
 }

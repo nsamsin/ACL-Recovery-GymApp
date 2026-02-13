@@ -2,17 +2,232 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── iOS base ─────────────────────────────────────── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f8fafc;
-  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  background: #f2f2f7;
+  color: #1c1c1e;
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
 }
 
+/* ── Card ─────────────────────────────────────────── */
 .card {
-  @apply rounded-2xl bg-white p-4 shadow-sm border border-slate-200;
+  @apply rounded-ios-lg bg-white p-4 shadow-ios;
+  border: none;
+  transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.card:active {
+  transform: scale(0.98);
 }
 
+/* ── Touch button ─────────────────────────────────── */
 .touch-btn {
-  @apply min-h-12 px-4 py-3 rounded-xl font-semibold;
+  @apply rounded-ios font-semibold;
+  min-height: 44px;
+  padding: 10px 16px;
+  transition: transform 0.15s cubic-bezier(0.25, 0.1, 0.25, 1),
+    opacity 0.15s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.touch-btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* ── Primary button ───────────────────────────────── */
+.btn-primary {
+  @apply touch-btn w-full text-white font-semibold;
+  background: linear-gradient(135deg, #007aff 0%, #0063d1 100%);
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+}
+.btn-primary:active {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+/* ── Secondary button ─────────────────────────────── */
+.btn-secondary {
+  @apply touch-btn w-full font-semibold;
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
+}
+.btn-secondary:active {
+  background: rgba(0, 122, 255, 0.18);
+}
+
+/* ── Glass nav ────────────────────────────────────── */
+.glass-nav {
+  background: rgba(249, 249, 249, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Glass header ─────────────────────────────────── */
+.glass-header {
+  background: rgba(26, 39, 68, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ── iOS form input ───────────────────────────────── */
+.ios-input {
+  @apply w-full rounded-ios bg-surface-secondary px-4 py-3 text-[15px];
+  border: 1.5px solid transparent;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ios-input:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+/* ── iOS toggle switch ────────────────────────────── */
+.ios-toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+.ios-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 1;
+  margin: 0;
+}
+.ios-toggle .toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 15.5px;
+  background: #e5e5ea;
+  transition: background 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.ios-toggle input:checked + .toggle-track {
+  background: #34c759;
+}
+.ios-toggle .toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.ios-toggle input:checked + .toggle-track::after {
+  transform: translateX(20px);
+}
+
+/* ── iOS range slider ─────────────────────────────── */
+.ios-range {
+  @apply w-full;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e5ea;
+  outline: none;
+}
+.ios-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.ios-range::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+/* ── iOS select ───────────────────────────────────── */
+.ios-select {
+  @apply w-full rounded-ios bg-surface-secondary px-4 py-3 text-[15px];
+  border: 1.5px solid transparent;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238E8E93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ios-select:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+/* ── Tab content fade ─────────────────────────────── */
+.tab-content {
+  animation: fade-in 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── Staggered slide-up for children ──────────────── */
+.animate-stagger > * {
+  animation: slide-up 0.35s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+
+/* ── Progress bar ─────────────────────────────────── */
+.progress-bar {
+  @apply h-2 rounded-full overflow-hidden;
+  background: #e5e5ea;
+}
+.progress-bar-fill {
+  @apply h-full rounded-full;
+  background: linear-gradient(90deg, #007aff, #5ac8fa);
+  transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ── Recharts overrides ───────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #f0f0f5;
+}
+.recharts-text {
+  font-size: 11px;
+  fill: #8e8e93;
+}
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  border-radius: 10px !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
 }

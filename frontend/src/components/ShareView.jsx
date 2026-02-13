@@ -5,19 +5,19 @@ export default function ShareView({ shareToken, shareData, onLoadShare }) {
     <div className="space-y-4">
       <div className="card">
         <p className="font-semibold">Deellink voor fysiotherapeut</p>
-        <p className="break-all text-sm">{link}</p>
+        <p className="mt-1 break-all text-[13px] text-[#8e8e93]">{link}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <button className="touch-btn bg-slate-900 text-white" onClick={onLoadShare}>Laad read-only overzicht</button>
-          <button className="touch-btn bg-slate-200" onClick={() => navigator.clipboard.writeText(link)}>Kopieer link</button>
+          <button className="btn-primary" onClick={onLoadShare}>Laad overzicht</button>
+          <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(link)}>Kopieer link</button>
         </div>
       </div>
       {shareData ? (
         <div className="space-y-3">
           <div className="card">
             <p className="font-semibold">Read-only samenvatting</p>
-            <p className="text-sm">Sessies: {shareData.sessions?.length || 0}</p>
-            <p className="text-sm">Health logs: {shareData.healthLog?.length || 0}</p>
-            <p className="text-sm">Exercise logs: {shareData.sessionExercises?.length || 0}</p>
+            <p className="text-[13px] text-[#8e8e93]">Sessies: {shareData.sessions?.length || 0}</p>
+            <p className="text-[13px] text-[#8e8e93]">Health logs: {shareData.healthLog?.length || 0}</p>
+            <p className="text-[13px] text-[#8e8e93]">Exercise logs: {shareData.sessionExercises?.length || 0}</p>
           </div>
           <div className="card">
             <p className="mb-2 font-semibold">Recente oefeningen</p>
