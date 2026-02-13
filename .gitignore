@@ -1,2 +1,14 @@
+# Environment variables
 .env
-config/
+
+# Secrets
+secrets.json
+
+# IDE settings
+.idea/
+*.iml
+*.ipr
+
+# Development cache files
+.cache/
+*.tmp
