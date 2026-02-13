@@ -11,7 +11,9 @@ export default function Settings({
   onUpdatePin,
   onCreateExercise,
   onDeleteExercise,
-  onReorderExercises
+  onReorderExercises,
+  theme,
+  onToggleTheme
 }) {
   const [name, setName] = useState(user.name);
   const [currentPin, setCurrentPin] = useState("");
@@ -43,6 +45,19 @@ export default function Settings({
 
   return (
     <div className="space-y-4">
+      <div className="card">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold">Donker thema</h3>
+            <p className="text-[13px] text-[#8e8e93]">Schakel tussen licht en donker</p>
+          </div>
+          <label className="ios-toggle">
+            <input type="checkbox" checked={theme === "dark"} onChange={onToggleTheme} />
+            <span className="toggle-track" />
+          </label>
+        </div>
+      </div>
+
       <div className="card">
         <h3 className="font-semibold">Instellingen</h3>
         <label className="mt-3 block">

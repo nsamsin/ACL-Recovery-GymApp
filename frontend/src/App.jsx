@@ -83,7 +83,7 @@ function ShareRoute({ token }) {
       <header className="glass-header mb-4 rounded-ios-lg p-4 text-white">
         <h1 className="text-lg font-bold">ACL Revalidatie - Read-only</h1>
       </header>
-      {error && <div className="card text-red-700">{error}</div>}
+      {error && <div className="card text-ios-red">{error}</div>}
       {data ? (
         <div className="space-y-3">
           <div className="card"><p className="font-semibold">Patiënt: {data.user?.name || "Onbekend"}</p></div>
@@ -160,6 +160,16 @@ function MainApp() {
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [sessionState, setSessionState] = useState({});
   const [syncStatus, setSyncStatus] = useState("");
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("acl_theme") || "dark";
+    document.documentElement.classList.toggle("dark", saved === "dark");
+    return saved;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("acl_theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     const id = localStorage.getItem("acl_user_id");
@@ -435,6 +445,8 @@ function MainApp() {
                 onCreateExercise={createExercise}
                 onDeleteExercise={deleteExercise}
                 onReorderExercises={reorderExercises}
+                theme={theme}
+                onToggleTheme={() => setTheme((t) => t === "dark" ? "light" : "dark")}
               />
             </div>
           )}
