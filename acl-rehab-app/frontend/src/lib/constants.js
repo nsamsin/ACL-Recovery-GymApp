@@ -1,4 +1,12 @@
-export const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8787";
+const isLocalhost =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+export const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  (isLocalhost
+    ? "http://127.0.0.1:8787"
+    : "https://acl-rehab-api.hedson-it.workers.dev");
 
 export const categories = [
   { key: "warmup", label: "☀️ Warming-up", color: "bg-amber-100 border-amber-300" },
