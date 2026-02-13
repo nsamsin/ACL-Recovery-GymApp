@@ -19,7 +19,7 @@ function corsHeadersFor(request: Request): Record<string, string> {
 
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Methods": "GET,POST,PUT,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type,x-user-id",
     Vary: "Origin"
   };
@@ -147,6 +147,66 @@ export default {
         )
           .bind(body.default_weight ?? null, body.note ?? null, id)
           .run();
+        return json(request, { ok: true });
+      }
+
+      if (path === "/api/exercises" && request.method === "POST") {
+        const body = (await request.json()) as {
+          id?: string;
+          name?: string;
+          category?: string;
+          default_sets?: number;
+          default_reps?: string;
+          default_weight?: string;
+          note?: string;
+          image_url?: string;
+          is_timed?: boolean;
+        };
+
+        if (!body.id || !body.name || !body.category) {
+          return json(request, { error: "id, name en category zijn verplicht" }, 400);
+        }
+
+        const maxSort = await env.DB.prepare("SELECT COALESCE(MAX(sort_order), 0) AS max_sort FROM exercises").first<{ max_sort: number }>();
+        const sortOrder = Number(maxSort?.max_sort || 0) + 1;
+
+        await env.DB.prepare(
+          "INSERT INTO exercises (id, name, category, default_sets, default_reps, default_weight, note, image_url, sort_order, is_timed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        )
+          .bind(
+            body.id,
+            body.name,
+            body.category,
+            body.default_sets ?? 2,
+            body.default_reps ?? "10",
+            body.default_weight ?? "Lichaamsgewicht",
+            body.note ?? "",
+            body.image_url ?? "/images/c_dead_bugs.svg",
+            sortOrder,
+            body.is_timed ? 1 : 0
+          )
+          .run();
+
+        return json(request, { ok: true }, 201);
+      }
+
+      if (path === "/api/exercises/reorder" && request.method === "PUT") {
+        const body = (await request.json()) as { order?: string[] };
+        const order = body.order || [];
+        if (!Array.isArray(order) || !order.length) return json(request, { error: "order ontbreekt" }, 400);
+
+        for (let i = 0; i < order.length; i += 1) {
+          await env.DB.prepare("UPDATE exercises SET sort_order = ? WHERE id = ?").bind(i + 1, order[i]).run();
+        }
+        return json(request, { ok: true });
+      }
+
+      if (path.startsWith("/api/exercises/") && request.method === "DELETE") {
+        const id = path.split("/").pop();
+        if (!id) return json(request, { error: "id ontbreekt" }, 400);
+
+        await env.DB.prepare("DELETE FROM exercises WHERE id = ?").bind(id).run();
+        await env.DB.prepare("DELETE FROM session_exercises WHERE exercise_id = ?").bind(id).run();
         return json(request, { ok: true });
       }
 
