@@ -159,7 +159,6 @@ Stel in op repo-niveau (`Settings -> Secrets and variables -> Actions`):
     - Cloudflare Pages: Edit
     - D1: Edit
 - `CLOUDFLARE_ACCOUNT_ID`
-  - Voor deze setup: `a589b1c276ad3d137fa1f32ad773acd9`
 
 Zodra deze secrets staan, wordt elke push naar `main` automatisch gedeployed.
 
