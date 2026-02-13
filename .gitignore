@@ -1,14 +1,36 @@
-# Environment variables
+# Node
+node_modules/
+
+# Frontend build
+frontend/dist/
+
+# Worker build/cache
+worker/.wrangler/
+worker/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+
+# Environment variables & secrets
 .env
+.env.local
+.env.*.local
+.env.production.local
 
-# Secrets
-secrets.json
+# Wrangler configuration (contains database bindings)
+wrangler.toml
 
-# IDE settings
+# IDE & Editor
+.vscode/
 .idea/
-*.iml
-*.ipr
+*.swp
+*.swo
 
-# Development cache files
+# Development
 .cache/
-*.tmp
