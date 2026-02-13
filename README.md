@@ -1,3 +1,5 @@
+[![Deploy Cloudflare](https://github.com/nsamsin/ACL-Recovery-GymApp/actions/workflows/cloudflare-deploy.yml/badge.svg)](https://github.com/nsamsin/ACL-Recovery-GymApp/actions/workflows/cloudflare-deploy.yml)
+
 # ACL Revalidatie Gym App
 
 Mobiele-first Progressive Web App (PWA) voor ACL-revalidatie na een quad tendon graft reconstructie + meniscushechting. Bevat een gestructureerd gym-schema, oefening-illustraties, sessie-tracking, progressie-logging en een pijn/zwelling dagboek.
