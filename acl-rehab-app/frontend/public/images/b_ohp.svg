@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <rect width="160" height="160" fill="#e2e8f0"/>
+  <circle cx="80" cy="45" r="18" fill="#334155"/>
+  <path d="M55 78h50v14H55z" fill="#475569"/>
+  <path d="M62 92l-16 32h14l14-24 14 24h14l-16-32" fill="#64748b"/>
+  <text x="80" y="145" text-anchor="middle" font-size="10" fill="#0f172a">b_ohp</text>
+</svg>

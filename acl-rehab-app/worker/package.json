@@ -1,0 +1,15 @@
+{
+  "name": "acl-rehab-worker",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.88.0"
+  }
+}

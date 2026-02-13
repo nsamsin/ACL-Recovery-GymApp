@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.card {
+  @apply rounded-2xl bg-white p-4 shadow-sm border border-slate-200;
+}
+
+.touch-btn {
+  @apply min-h-12 px-4 py-3 rounded-xl font-semibold;
+}
