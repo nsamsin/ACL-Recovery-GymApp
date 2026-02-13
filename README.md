@@ -20,11 +20,11 @@ Mobiele-first Progressive Web App (PWA) voor ACL-revalidatie na een quad tendon 
 ├── frontend/                  # React + Vite + Tailwind
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── LoginSetup.jsx     # PIN-login & registratie
-│   │   │   ├── Dashboard.jsx      # Welkom, stats, quick-actions
+│   │   │   ├── LoginSetup.jsx     # PIN-login & registratie (PIN-only voor terugkerende users)
+│   │   │   ├── Dashboard.jsx      # Welkom, stats, streak op trainingsdagen
 │   │   │   ├── SessionView.jsx    # Workout tracker per blok
 │   │   │   ├── ExerciseCard.jsx   # Oefening-kaart met checkbox/timer
-│   │   │   ├── Timer.jsx          # Countdown met vibratie & geluid
+│   │   │   ├── Timer.jsx          # Countdown met vibratie, geluid & +/-15s
 │   │   │   ├── HealthLog.jsx      # Pijn/zwelling/ROM dagboek
 │   │   │   ├── Progress.jsx       # Trend-grafieken (Recharts)
 │   │   │   ├── ShareView.jsx      # Deellink voor fysiotherapeut
@@ -32,7 +32,7 @@ Mobiele-first Progressive Web App (PWA) voor ACL-revalidatie na een quad tendon 
 │   │   ├── lib/
 │   │   │   ├── api.js             # Fetch-wrapper voor alle endpoints
 │   │   │   └── constants.js       # API base URL & categorie-definitie
-│   │   ├── App.jsx                # Routing, auth-state, tab-navigatie
+│   │   ├── App.jsx                # Routing, auth-state, tab-navigatie, ShareRoute
 │   │   ├── main.jsx               # Entry-point + service worker registratie
 │   │   └── index.css              # Tailwind directives + card/button classes
 │   ├── public/
@@ -160,38 +160,39 @@ De app is installeerbaar op het homescreen:
 
 Attributie: zie `frontend/public/images/wger/ATTRIBUTION.md`.
 
-## Bekend issues & TODO
+## Opgeloste issues
 
-Dit project is gegenereerd door OpenAI Codex en is ~75% compleet. Openstaande punten:
+Oorspronkelijk gegenereerd door OpenAI Codex, inmiddels handmatig gereviewed en bijgewerkt. Alle bekende bugs en ontbrekende features zijn opgelost:
 
-### Bugs
+### Bugs (opgelost)
 
-- [ ] React Rules of Hooks violation in `App.jsx` (hooks na conditionele return)
-- [ ] Race condition bij user registratie (SELECT na INSERT zonder deterministische lookup)
-- [ ] Login-collision: twee users met dezelfde PIN loggen in op hetzelfde account
-- [ ] Timer useEffect dependency-loop (`secondsLeft` als dependency terwijl het in de callback wordt gewijzigd)
+- [x] React Rules of Hooks violation in `App.jsx`
+- [x] Race condition bij user registratie
+- [x] Login-collision: login gebruikt nu opgeslagen `user_id`
+- [x] Timer useEffect dependency-loop (draait op `running` state)
+- [x] Timer +/-15s knoppen werkten niet tijdens countdown (targetRef sync)
 
-### Ontbrekende features
+### Features (opgelost)
 
-- [ ] Gewicht-progressie grafiek per oefening (endpoint bestaat, frontend mist)
-- [ ] Lijst van afgeronde sessies met datum in Progressie-scherm
-- [ ] Volledige read-only share view voor fysiotherapeut (nu alleen counts)
-- [ ] Naam wijzigen in Instellingen
-- [ ] PIN wijzigen in Instellingen
-- [ ] Schema aanpassen (oefeningen toevoegen/verwijderen/herordenen)
-- [ ] Kopieer-knop voor deellink
-- [ ] Offline write-queue met sync
+- [x] Gewicht-progressie grafiek per oefening (Progressie-scherm)
+- [x] Gewichtsprogressie per oefening in read-only share view
+- [x] Lijst van afgeronde sessies met datum in Progressie-scherm
+- [x] Volledige read-only share view met pijn/zwelling trend en oefening-statistieken
+- [x] Naam en PIN wijzigen in Instellingen
+- [x] Schema aanpassen (oefeningen toevoegen/verwijderen/herordenen)
+- [x] Kopieer-knop voor deellink
+- [x] Offline write-queue met automatische sync bij reconnect
 
-### Verbeteringen
+### Verbeteringen (opgelost)
 
-- [ ] Rate limiting op login endpoint
-- [ ] CORS beperken tot eigen domein
-- [ ] PIN-invoer maskeren (`type="password"`)
-- [ ] Loading states bij API-calls
-- [ ] Echte streak-berekening (nu: `min(sessiesDezeWeek, 3)`)
-- [ ] Volgende sessiedatum berekenen i.p.v. statische tekst
-- [ ] Meer assets pre-cachen in Service Worker
-- [ ] PWA iconen: `purpose: "maskable any"` toevoegen
+- [x] Rate limiting op login endpoint
+- [x] CORS beperkt tot eigen domein + localhost
+- [x] PIN-invoer gemaskeerd (`type="password"`)
+- [x] Loading states bij API-calls
+- [x] Streak-berekening op basis van geplande trainingsdagen (ma/wo/vr)
+- [x] Volgende sessiedatum berekend op basis van trainingsschema
+- [x] PWA iconen met `purpose: "maskable any"`
+- [x] Returning users zien alleen PIN-veld (naam als read-only greeting)
 
 ## Licentie
 
