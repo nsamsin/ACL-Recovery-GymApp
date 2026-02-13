@@ -2,9 +2,7 @@ const isLocalhost =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1";
 
-const PROD_API_BASE = "https://acl-rehab-api.hedson-it.workers.dev";
-
-export const API_BASE = isLocalhost ? "http://127.0.0.1:8787" : PROD_API_BASE;
+export const API_BASE = isLocalhost ? "http://127.0.0.1:8787" : "";
 
 export const categories = [
   { key: "warmup", label: "☀️ Warming-up", color: "bg-amber-100 border-amber-300" },
