@@ -72,9 +72,15 @@ export default function Timer({ defaultText }) {
         >
           Reset
         </button>
-        <button className="touch-btn bg-slate-300" onClick={() => setSecondsLeft((s) => Math.max(0, s - 15))}>-15s</button>
+        <button className="touch-btn bg-slate-300" onClick={() => {
+          if (targetRef.current) targetRef.current -= 15000;
+          setSecondsLeft((s) => Math.max(0, s - 15));
+        }}>-15s</button>
       </div>
-      <button className="touch-btn mt-2 w-full bg-slate-200" onClick={() => setSecondsLeft((s) => s + 15)}>+15s</button>
+      <button className="touch-btn mt-2 w-full bg-slate-200" onClick={() => {
+        if (targetRef.current) targetRef.current += 15000;
+        setSecondsLeft((s) => s + 15);
+      }}>+15s</button>
     </div>
   );
 }

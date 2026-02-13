@@ -22,9 +22,10 @@ function ShareRoute({ token }) {
   const trend = (data?.healthLog || []).slice().reverse().map((h) => ({ date: h.date, pijn: h.pain, zwelling: h.swelling }));
   const perExercise = Object.values(
     (data?.sessionExercises || []).reduce((acc, row) => {
-      if (!acc[row.exercise_id]) acc[row.exercise_id] = { name: row.exercise_name, logs: 0, completed: 0 };
+      if (!acc[row.exercise_id]) acc[row.exercise_id] = { name: row.exercise_name, logs: 0, completed: 0, weights: [] };
       acc[row.exercise_id].logs += 1;
       if (row.completed) acc[row.exercise_id].completed += 1;
+      if (row.weight_used != null) acc[row.exercise_id].weights.push({ date: row.session_date || row.date, weight: Number(row.weight_used) });
       return acc;
     }, {})
   );
@@ -60,6 +61,34 @@ function ShareRoute({ token }) {
               ))}
             </ul>
           </div>
+          {perExercise.some((e) => e.weights.length > 0) && (
+            <div className="card">
+              <p className="mb-2 font-semibold">Gewichtsprogressie</p>
+              {perExercise.filter((e) => e.weights.length > 0).slice(0, 12).map((e) => {
+                const sorted = [...e.weights].sort((a, b) => a.date < b.date ? -1 : 1);
+                const first = sorted[0];
+                const latest = sorted[sorted.length - 1];
+                const diff = latest.weight - first.weight;
+                return (
+                  <div key={e.name} className="mb-3">
+                    <p className="text-sm font-medium">{e.name}</p>
+                    <ResponsiveContainer width="100%" height={80}>
+                      <LineChart data={sorted}>
+                        <XAxis dataKey="date" hide />
+                        <YAxis domain={["dataMin - 1", "dataMax + 1"]} hide />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="weight" stroke="#3b82f6" dot={false} strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                    <p className="text-xs text-slate-500">
+                      {first.weight} kg → {latest.weight} kg
+                      {diff !== 0 && <span className={diff > 0 ? " text-green-600" : " text-red-600"}> ({diff > 0 ? "+" : ""}{diff} kg)</span>}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : !error ? (
         <div className="card">Laden...</div>

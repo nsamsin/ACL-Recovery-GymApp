@@ -12,17 +12,43 @@ function nextPlannedSessionLabel() {
 }
 
 function workoutStreak(sessions) {
-  const uniqueDays = [...new Set(sessions.map((s) => s.date))]
-    .map((d) => new Date(`${d}T00:00:00`))
-    .sort((a, b) => b - a);
+  const plannedDays = [1, 3, 5]; // Mon, Wed, Fri
+  const sessionDates = new Set(sessions.map((s) => s.date));
+  if (!sessionDates.size) return 0;
 
-  if (!uniqueDays.length) return 0;
-  let streak = 1;
-  for (let i = 1; i < uniqueDays.length; i += 1) {
-    const diffDays = Math.round((uniqueDays[i - 1] - uniqueDays[i]) / 86400000);
-    if (diffDays === 1) streak += 1;
-    else break;
+  // Walk backwards through planned workout days starting from today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let streak = 0;
+  let d = new Date(today);
+
+  // Rewind to the most recent planned day (today or earlier)
+  while (!plannedDays.includes(d.getDay())) {
+    d.setDate(d.getDate() - 1);
   }
+
+  // If the most recent planned day is today and no session yet, start from previous planned day
+  const todayStr = today.toISOString().slice(0, 10);
+  const latestStr = d.toISOString().slice(0, 10);
+  if (latestStr === todayStr && !sessionDates.has(todayStr)) {
+    d.setDate(d.getDate() - 1);
+    while (!plannedDays.includes(d.getDay())) {
+      d.setDate(d.getDate() - 1);
+    }
+  }
+
+  // Count consecutive planned days with sessions
+  for (let i = 0; i < 100; i += 1) {
+    const dateStr = d.toISOString().slice(0, 10);
+    if (!sessionDates.has(dateStr)) break;
+    streak += 1;
+    // Move to previous planned day
+    d.setDate(d.getDate() - 1);
+    while (!plannedDays.includes(d.getDay())) {
+      d.setDate(d.getDate() - 1);
+    }
+  }
+
   return streak;
 }
 
