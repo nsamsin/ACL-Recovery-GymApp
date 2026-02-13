@@ -12,7 +12,7 @@ export default function LoginSetup({ hasUser, initialName, onSubmit, error, busy
     <div className="min-h-screen p-6 text-white" style={{ background: "linear-gradient(145deg, #1a2744 0%, #2a3f6f 100%)" }}>
       <h1 className="text-3xl font-bold">ACL Revalidatie</h1>
       <p className="mt-2 text-white/70">{hasUser ? "Welkom terug!" : "Stel je naam en PIN in"}</p>
-      <div className="mt-8 card text-[#1c1c1e] animate-slide-up">
+      <div className="mt-8 card animate-slide-up">
         {hasUser ? (
           <p className="mb-4 text-lg font-semibold">{name}</p>
         ) : (
