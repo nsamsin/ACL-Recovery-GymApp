@@ -12,11 +12,6 @@ De app bevat:
 - progressie-overzichten
 - deelbare read-only view voor fysiotherapeut
 
-## Live Omgeving
-
-- Frontend (Pages): https://acl-rehab-app-3rs.pages.dev
-- API (Worker): https://acl-rehab-api.hedson-it.workers.dev
-
 ## Architectuur
 
 - `frontend/`
