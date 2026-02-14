@@ -1,21 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { api, syncQueuedWrites } from "./lib/api";
+import { LangContext, useT } from "./lib/i18n";
 import LoginSetup from "./components/LoginSetup";
 import Dashboard from "./components/Dashboard";
 import SessionView from "./components/SessionView";
 import HealthLog from "./components/HealthLog";
 import Progress from "./components/Progress";
-import ShareView from "./components/ShareView";
 import Settings from "./components/Settings";
-
-const tabConfig = [
-  { key: "dashboard", label: "Home", icon: "house" },
-  { key: "sessie", label: "Sessie", icon: "dumbbell" },
-  { key: "dagboek", label: "Dagboek", icon: "book" },
-  { key: "progressie", label: "Progressie", icon: "chart" },
-  { key: "meer", label: "Meer", icon: "gear" }
-];
 
 function TabIcon({ name, active }) {
   const color = active ? "#007aff" : "#8e8e93";
@@ -60,6 +52,7 @@ function TabIcon({ name, active }) {
 }
 
 function ShareRoute({ token }) {
+  const t = useT();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
@@ -67,7 +60,7 @@ function ShareRoute({ token }) {
     api.share(token).then(setData).catch((e) => setError(e.message));
   }, [token]);
 
-  const trend = (data?.healthLog || []).slice().reverse().map((h) => ({ date: h.date, pijn: h.pain, zwelling: h.swelling }));
+  const trend = (data?.healthLog || []).slice().reverse().map((h) => ({ date: h.date, pain: h.pain, swelling: h.swelling }));
   const perExercise = Object.values(
     (data?.sessionExercises || []).reduce((acc, row) => {
       if (!acc[row.exercise_id]) acc[row.exercise_id] = { name: row.exercise_name, logs: 0, completed: 0, weights: [] };
@@ -81,37 +74,37 @@ function ShareRoute({ token }) {
   return (
     <main className="min-h-screen bg-surface-secondary p-4">
       <header className="glass-header mb-4 rounded-ios-lg p-4 text-white">
-        <h1 className="text-lg font-bold">ACL Revalidatie - Read-only</h1>
+        <h1 className="text-lg font-bold">{t("readOnly")}</h1>
       </header>
       {error && <div className="card text-ios-red">{error}</div>}
       {data ? (
         <div className="space-y-3">
-          <div className="card"><p className="font-semibold">Patiënt: {data.user?.name || "Onbekend"}</p></div>
-          <div className="card"><p className="text-sm">Sessies: {data.sessions?.length || 0}</p><p className="text-sm">Oefening-logs: {data.sessionExercises?.length || 0}</p></div>
+          <div className="card"><p className="font-semibold">{t("patient")} {data.user?.name || t("unknown")}</p></div>
+          <div className="card"><p className="text-sm">{t("sessions")}: {data.sessions?.length || 0}</p><p className="text-sm">{t("exerciseLogs")}: {data.sessionExercises?.length || 0}</p></div>
           <div className="card h-64">
-            <p className="font-semibold">Pijn/zwelling trend</p>
+            <p className="font-semibold">{t("painTrendShare")}</p>
             <ResponsiveContainer width="100%" height="85%">
               <LineChart data={trend}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis domain={[0, 10]} />
                 <Tooltip />
-                <Line type="monotone" dataKey="pijn" stroke="#ff3b30" strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="zwelling" stroke="#ff9500" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="pain" stroke="#ff3b30" strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="swelling" stroke="#ff9500" strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className="card">
-            <p className="mb-2 font-semibold">Progressie per oefening</p>
+            <p className="mb-2 font-semibold">{t("progressPerEx")}</p>
             <ul className="space-y-1 text-sm">
               {perExercise.slice(0, 12).map((e) => (
-                <li key={e.name}>{e.name}: {e.completed}/{e.logs} afgerond</li>
+                <li key={e.name}>{e.name}: {e.completed}/{e.logs} {t("completed")}</li>
               ))}
             </ul>
           </div>
           {perExercise.some((e) => e.weights.length > 0) && (
             <div className="card">
-              <p className="mb-2 font-semibold">Gewichtsprogressie</p>
+              <p className="mb-2 font-semibold">{t("weightProgress")}</p>
               {perExercise.filter((e) => e.weights.length > 0).slice(0, 12).map((e) => {
                 const sorted = [...e.weights].sort((a, b) => a.date < b.date ? -1 : 1);
                 const first = sorted[0];
@@ -139,13 +132,14 @@ function ShareRoute({ token }) {
           )}
         </div>
       ) : !error ? (
-        <div className="card">Laden...</div>
+        <div className="card">{t("loading")}</div>
       ) : null}
     </main>
   );
 }
 
 function MainApp() {
+  const t = useT();
   const [authChecked, setAuthChecked] = useState(false);
   const [user, setUser] = useState(null);
   const [hasUser, setHasUser] = useState(!!localStorage.getItem("acl_has_user"));
@@ -186,7 +180,7 @@ function MainApp() {
     const onOnline = async () => {
       const res = await syncQueuedWrites();
       if (res.synced > 0) {
-        setSyncStatus(`${res.synced} offline acties gesynchroniseerd`);
+        setSyncStatus(`${res.synced} ${t("offlineSessionQueued").includes("offline") ? "offline actions synced" : "offline acties gesynchroniseerd"}`);
         await hydrate();
         setTimeout(() => setSyncStatus(""), 4000);
       }
@@ -204,7 +198,7 @@ function MainApp() {
       setHealthLog(hl.items || []);
       setError("");
     } catch (e) {
-      setError(e.message || "Kon data niet laden");
+      setError(e.message || t("couldNotLoad"));
     }
   }
 
@@ -247,33 +241,25 @@ function MainApp() {
   }
 
   async function startSession() {
-    setActionBusy("Sessie starten...");
+    setActionBusy(t("startingSession"));
     try {
       const created = await api.createSession();
-      if (created.queued) {
-        setSyncStatus("Offline: sessie start is in wachtrij gezet");
-        return;
-      }
+      if (created.queued) { setSyncStatus(t("offlineSessionQueued")); return; }
       setActiveSessionId(created.session.id);
       setTab("sessie");
       setError("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setActionBusy("");
-    }
+    } catch (e) { setError(e.message); }
+    finally { setActionBusy(""); }
   }
 
   function onChangeExercise(id, field, value) {
     setSessionState((prev) => ({ ...prev, [id]: { ...(prev[id] || {}), [field]: value } }));
-    if (field === "weight_used") {
-      localStorage.setItem(`last_weight_${id}`, value);
-    }
+    if (field === "weight_used") localStorage.setItem(`last_weight_${id}`, value);
   }
 
   async function finishSession() {
     if (!activeSessionId) return;
-    setActionBusy("Sessie afronden...");
+    setActionBusy(t("finishingSession"));
     try {
       const logResults = await Promise.all(
         Object.entries(sessionState).map(([exercise_id, payload]) =>
@@ -281,99 +267,89 @@ function MainApp() {
         )
       );
       const finishRes = await api.finishSession(activeSessionId, { completed: true });
-      if (finishRes.queued || logResults.some((r) => r?.queued)) {
-        setSyncStatus("Offline: sessie-updates staan in wachtrij");
-      }
+      if (finishRes.queued || logResults.some((r) => r?.queued)) setSyncStatus(t("offlineSessionUpdates"));
       setActiveSessionId(null);
       await hydrate();
       setTab("dashboard");
       setError("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setActionBusy("");
-    }
+    } catch (e) { setError(e.message); }
+    finally { setActionBusy(""); }
   }
 
   async function saveHealth(payload) {
-    setActionBusy("Dagboek opslaan...");
+    setActionBusy(t("savingJournal"));
     try {
       const res = await api.addHealthLog(payload);
-      if (res.queued) setSyncStatus("Offline: dagboekentry in wachtrij");
+      if (res.queued) setSyncStatus(t("offlineJournalQueued"));
       await hydrate();
       setTab("dashboard");
       setError("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setActionBusy("");
-    }
+    } catch (e) { setError(e.message); }
+    finally { setActionBusy(""); }
   }
 
   async function loadShare() {
     if (!user?.share_token) return;
-    setActionBusy("Share data laden...");
+    setActionBusy(t("loadingShareData"));
     try {
       const data = await api.share(user.share_token);
       setShareData(data);
       setError("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setActionBusy("");
-    }
+    } catch (e) { setError(e.message); }
+    finally { setActionBusy(""); }
   }
 
   async function updateName(name) {
     const res = await api.updateName(name);
-    if (res.queued) {
-      setSyncStatus("Offline: naamwijziging in wachtrij");
-      return;
-    }
+    if (res.queued) { setSyncStatus(t("offlineNameQueued")); return; }
     localStorage.setItem("acl_user_name", res.user.name);
     setUser((prev) => ({ ...prev, ...res.user }));
   }
 
-  async function updatePin(currentPin, newPin) {
-    await api.updatePin(currentPin, newPin);
-  }
+  async function updatePin(currentPin, newPin) { await api.updatePin(currentPin, newPin); }
 
   async function createExercise(payload) {
     const res = await api.createExercise(payload);
-    if (res.queued) setSyncStatus("Offline: oefening toevoegen in wachtrij");
+    if (res.queued) setSyncStatus(t("offlineExAddQueued"));
     await hydrate();
   }
 
   async function deleteExercise(id) {
     const res = await api.deleteExercise(id);
-    if (res.queued) setSyncStatus("Offline: oefening verwijderen in wachtrij");
+    if (res.queued) setSyncStatus(t("offlineExDelQueued"));
     await hydrate();
   }
 
   async function reorderExercises(order) {
     const res = await api.reorderExercises(order);
-    if (res.queued) setSyncStatus("Offline: volgorde in wachtrij");
+    if (res.queued) setSyncStatus(t("offlineReorderQueued"));
     await hydrate();
   }
 
   function exportJson() {
-    const blob = new Blob([JSON.stringify({ user, sessions, healthLog, exercises }, null, 2)], {
-      type: "application/json"
-    });
+    const blob = new Blob([JSON.stringify({ user, sessions, healthLog, exercises }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "acl-revalidatie-export.json";
+    a.download = "acl-recovery-export.json";
     a.click();
     URL.revokeObjectURL(url);
   }
 
+  const tabConfig = [
+    { key: "dashboard", label: t("tabHome"), icon: "house" },
+    { key: "sessie", label: t("tabSession"), icon: "dumbbell" },
+    { key: "dagboek", label: t("tabJournal"), icon: "book" },
+    { key: "progressie", label: t("tabProgress"), icon: "chart" },
+    { key: "meer", label: t("tabMore"), icon: "gear" }
+  ];
+
   const tabTitle = {
-    dashboard: "Home",
-    sessie: "Sessie",
-    dagboek: "Dagboek",
-    progressie: "Progressie",
-    meer: "Meer"
+    dashboard: t("tabHome"),
+    sessie: t("tabSession"),
+    dagboek: t("tabJournal"),
+    progressie: t("tabProgress"),
+    meer: t("tabMore")
   };
 
   if (!authChecked) return null;
@@ -392,7 +368,7 @@ function MainApp() {
   return (
     <main className="min-h-screen bg-surface-secondary pb-24">
       <header className="glass-header sticky top-0 z-30 px-4 py-3 text-white text-center">
-        <h1 className="text-[17px] font-semibold">{tabTitle[tab] || "ACL Revalidatie"}</h1>
+        <h1 className="text-[17px] font-semibold">{tabTitle[tab] || t("appTitle")}</h1>
       </header>
 
       <div className="p-4 space-y-3">
@@ -414,59 +390,41 @@ function MainApp() {
 
         <div className="tab-content" key={tab}>
           {tab === "dashboard" && (
-            <Dashboard
-              user={user}
-              sessions={sessions}
-              healthLog={healthLog}
-              onStartSession={startSession}
-              onOpenHealth={() => setTab("dagboek")}
-            />
+            <Dashboard user={user} sessions={sessions} healthLog={healthLog} onStartSession={startSession} onOpenHealth={() => setTab("dagboek")} />
           )}
           {tab === "sessie" && (
-            <SessionView
-              exercises={orderedExercises}
-              sessionState={sessionState}
-              onChangeExercise={onChangeExercise}
-              onFinish={finishSession}
-            />
+            <SessionView exercises={orderedExercises} sessionState={sessionState} onChangeExercise={onChangeExercise} onFinish={finishSession} />
           )}
           {tab === "dagboek" && <HealthLog onSave={saveHealth} />}
           {tab === "progressie" && <Progress sessions={sessions} healthLog={healthLog} exercises={orderedExercises} />}
           {tab === "meer" && (
-            <div className="space-y-4">
-              <ShareView shareToken={user.share_token} shareData={shareData} onLoadShare={loadShare} />
-              <Settings
-                user={user}
-                shareToken={user.share_token}
-                exercises={orderedExercises}
-                onExport={exportJson}
-                onUpdateName={updateName}
-                onUpdatePin={updatePin}
-                onCreateExercise={createExercise}
-                onDeleteExercise={deleteExercise}
-                onReorderExercises={reorderExercises}
-                theme={theme}
-                onToggleTheme={() => setTheme((t) => t === "dark" ? "light" : "dark")}
-              />
-            </div>
+            <Settings
+              user={user}
+              shareToken={user.share_token}
+              shareData={shareData}
+              onLoadShare={loadShare}
+              exercises={orderedExercises}
+              onExport={exportJson}
+              onUpdateName={updateName}
+              onUpdatePin={updatePin}
+              onCreateExercise={createExercise}
+              onDeleteExercise={deleteExercise}
+              onReorderExercises={reorderExercises}
+              theme={theme}
+              onToggleTheme={() => setTheme((t) => t === "dark" ? "light" : "dark")}
+            />
           )}
         </div>
       </div>
 
       <nav className="glass-nav fixed bottom-0 left-0 right-0 z-30 shadow-ios-nav">
         <div className="mx-auto grid max-w-xl grid-cols-5 px-2 pt-1">
-          {tabConfig.map((t) => {
-            const active = tab === t.key;
+          {tabConfig.map((tc) => {
+            const active = tab === tc.key;
             return (
-              <button
-                key={t.key}
-                className="flex flex-col items-center gap-0.5 py-1 bg-transparent border-none"
-                onClick={() => setTab(t.key)}
-              >
-                <TabIcon name={t.icon} active={active} />
-                <span className={`text-[10px] font-medium ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`}>
-                  {t.label}
-                </span>
+              <button key={tc.key} className="flex flex-col items-center gap-0.5 py-1 bg-transparent border-none" onClick={() => setTab(tc.key)}>
+                <TabIcon name={tc.icon} active={active} />
+                <span className={`text-[10px] font-medium ${active ? "text-[#007aff]" : "text-[#8e8e93]"}`}>{tc.label}</span>
               </button>
             );
           })}
@@ -477,13 +435,24 @@ function MainApp() {
 }
 
 export default function App() {
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem("acl_lang") || "en";
+    document.documentElement.lang = saved;
+    return saved;
+  });
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    localStorage.setItem("acl_lang", lang);
+  }, [lang]);
+
   const shareTokenFromPath = window.location.pathname.startsWith("/share/")
     ? window.location.pathname.split("/")[2]
     : "";
 
-  if (shareTokenFromPath) {
-    return <ShareRoute token={shareTokenFromPath} />;
-  }
-
-  return <MainApp />;
+  return (
+    <LangContext.Provider value={{ lang, setLang }}>
+      {shareTokenFromPath ? <ShareRoute token={shareTokenFromPath} /> : <MainApp />}
+    </LangContext.Provider>
+  );
 }

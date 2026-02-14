@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "../lib/i18n";
 
 function parseSeconds(value) {
   const m = String(value || "").match(/(\d+)/);
@@ -8,6 +9,7 @@ function parseSeconds(value) {
 }
 
 export default function Timer({ defaultText }) {
+  const t = useT();
   const initial = useMemo(() => parseSeconds(defaultText), [defaultText]);
   const [secondsLeft, setSecondsLeft] = useState(initial);
   const [running, setRunning] = useState(false);
@@ -61,7 +63,7 @@ export default function Timer({ defaultText }) {
             setRunning((v) => !v);
           }}
         >
-          {running ? "Pauze" : "Start"}
+          {running ? t("pause") : t("start")}
         </button>
         <button
           className="btn-secondary"
@@ -70,7 +72,7 @@ export default function Timer({ defaultText }) {
             setRunning(false);
           }}
         >
-          Reset
+          {t("reset")}
         </button>
         <button className="btn-secondary" onClick={() => {
           if (targetRef.current) targetRef.current -= 15000;
