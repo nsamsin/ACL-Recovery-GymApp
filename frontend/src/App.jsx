@@ -218,11 +218,11 @@ function MainApp() {
     setSessionState(init);
   }, [orderedExercises]);
 
-  async function onAuthSubmit({ name, pin }) {
+  async function onAuthSubmit({ name, pin, mode }) {
     setError("");
     setAuthBusy(true);
     try {
-      const data = hasUser
+      const data = mode === "login"
         ? await api.login({ pin, name, user_id: localStorage.getItem("acl_user_id") || undefined })
         : await api.register(name, pin);
 
