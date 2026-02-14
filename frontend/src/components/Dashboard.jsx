@@ -1,14 +1,17 @@
-function nextPlannedSessionLabel() {
+import { useT } from "../lib/i18n";
+import { getLocale, useLang } from "../lib/i18n";
+
+function nextPlannedSessionLabel(locale) {
   const now = new Date();
   const plannedDays = [1, 3, 5];
   for (let i = 0; i < 7; i += 1) {
     const d = new Date(now);
     d.setDate(now.getDate() + i);
     if (plannedDays.includes(d.getDay())) {
-      return d.toLocaleDateString("nl-NL", { weekday: "long", day: "2-digit", month: "2-digit" });
+      return d.toLocaleDateString(locale, { weekday: "long", day: "2-digit", month: "2-digit" });
     }
   }
-  return "onbekend";
+  return null;
 }
 
 function workoutStreak(sessions) {
@@ -48,6 +51,10 @@ function workoutStreak(sessions) {
 }
 
 export default function Dashboard({ user, sessions, healthLog, onStartSession, onOpenHealth }) {
+  const t = useT();
+  const { lang } = useLang();
+  const locale = getLocale(lang);
+
   const thisWeek = sessions.filter((s) => {
     const d = new Date(s.date);
     const now = new Date();
@@ -64,28 +71,28 @@ export default function Dashboard({ user, sessions, healthLog, onStartSession, o
   return (
     <div className="animate-stagger space-y-4">
       <div className="card">
-        <h2 className="text-xl font-bold">Welkom, {user.name}</h2>
-        <p className="text-[13px] text-[#8e8e93]">Volgende sessie: {nextPlannedSessionLabel()}</p>
+        <h2 className="text-xl font-bold">{t("welcome")} {user.name}</h2>
+        <p className="text-[13px] text-[#8e8e93]">{t("nextSession")} {nextPlannedSessionLabel(locale) || t("unknown")}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="card">
-          <p className="text-[13px] text-[#8e8e93]">Sessies deze week</p>
+          <p className="text-[13px] text-[#8e8e93]">{t("sessionsWeek")}</p>
           <p className="text-[28px] font-bold">{thisWeek}</p>
         </div>
         <div className="card">
-          <p className="text-[13px] text-[#8e8e93]">Streak</p>
-          <p className="text-[28px] font-bold">{streak} <span className="text-[17px] font-normal">dagen</span></p>
+          <p className="text-[13px] text-[#8e8e93]">{t("streak")}</p>
+          <p className="text-[28px] font-bold">{streak} <span className="text-[17px] font-normal">{t("days")}</span></p>
         </div>
       </div>
 
       <div className={`card ${riskBg}`}>
-        <p className={`text-[13px] ${riskText}`}>Laatste pijn/zwelling</p>
-        {last ? <p className="font-semibold">Pijn {last.pain}/10 · Zwelling {last.swelling}/10</p> : <p>Nog geen dagboekdata</p>}
+        <p className={`text-[13px] ${riskText}`}>{t("lastPainSwelling")}</p>
+        {last ? <p className="font-semibold">{t("pain")} {last.pain}/10 · {t("swelling")} {last.swelling}/10</p> : <p>{t("noJournalData")}</p>}
       </div>
 
-      <button className="btn-primary" onClick={onStartSession}>Start Sessie</button>
-      <button className="btn-secondary" onClick={onOpenHealth}>Dagboek invullen</button>
+      <button className="btn-primary" onClick={onStartSession}>{t("startSession")}</button>
+      <button className="btn-secondary" onClick={onOpenHealth}>{t("fillJournal")}</button>
     </div>
   );
 }
