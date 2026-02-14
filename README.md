@@ -1,18 +1,16 @@
-[![Deploy Cloudflare](https://github.com/nsamsin/ACL-Recovery-GymApp/actions/workflows/cloudflare-deploy.yml/badge.svg)](https://github.com/nsamsin/ACL-Recovery-GymApp/actions/workflows/cloudflare-deploy.yml)
+# ACL Rehab Gym App
 
-# ACL Revalidatie Gym App
+A mobile-first Progressive Web App (PWA) for ACL rehabilitation after quad tendon graft reconstruction + meniscus repair.
 
-Mobiele-first Progressive Web App (PWA) voor ACL-revalidatie na een quad tendon graft reconstructie + meniscushechting.
+The app includes:
+- structured workout schedule (warm-up, block A/B/C, cool-down)
+- exercise illustrations (wger + SVG fallback)
+- session tracking
+- pain/swelling journal
+- progress analytics
+- shareable read-only view for a physiotherapist
 
-De app bevat:
-- gestructureerd gymschema (warming-up, blok A/B/C, cooling down)
-- oefeningillustraties (wger + SVG fallback)
-- sessie-tracking
-- pijn/zwelling dagboek
-- progressie-overzichten
-- deelbare read-only view voor fysiotherapeut
-
-## Architectuur
+## Architecture
 
 - `frontend/`
   - React 18 + Vite + Tailwind
@@ -22,46 +20,46 @@ De app bevat:
   - Cloudflare Worker API (TypeScript)
   - D1 binding in `wrangler.toml`
 - `schema.sql`
-  - D1 schema
+  - D1 database schema
 - `seed.sql`
-  - standaard oefeningen
+  - default exercise seed data
 
-## Request Flow (productie)
+## Request Flow (Production)
 
-1. Browser opent de app op Cloudflare Pages.
-2. Frontend doet API-calls naar same-origin `/api/*`.
-3. Pages Function proxyt `/api/*` naar de Worker.
-4. Worker verwerkt business logic en leest/schrijft in D1.
-5. JSON response gaat terug naar frontend.
+1. Browser loads the app from Cloudflare Pages.
+2. Frontend sends same-origin API calls to `/api/*`.
+3. Pages Function proxies `/api/*` to the Worker.
+4. Worker runs business logic and reads/writes D1.
+5. JSON response is returned to the frontend.
 
 ## Tech Stack
 
-| Laag | Technologie |
+| Layer | Technology |
 |---|---|
 | Frontend | React 18 (Vite) + Tailwind CSS |
 | Charts | Recharts |
 | Hosting | Cloudflare Pages |
 | Backend API | Cloudflare Workers |
 | Database | Cloudflare D1 (SQLite) |
-| Auth | Naam + 4-cijferige PIN (SHA-256 hash) |
+| Auth | Name + 4-digit PIN (SHA-256 hash) |
 
-## Kernfunctionaliteit
+## Core Features
 
-- Auth: registratie + login met naam/PIN
-- Dashboard: stats + volgende sessie + streak
-- Sessie view: per oefening loggen + timer
-- Health log: pijn/zwelling/stijfheid/ROM
-- Progressie: pijn/zwelling trend, cumulatieve sessies, gewichtprogressie per oefening
-- Share view (`/share/:token`): read-only overzicht voor fysiotherapeut
+- Auth: register + login using name/PIN
+- Dashboard: stats + next session + streak
+- Session view: per-exercise logging + timer
+- Health log: pain/swelling/stiffness/ROM
+- Progress: pain/swelling trend, cumulative sessions, per-exercise weight trend
+- Share view (`/share/:token`): read-only overview for physiotherapist
 - Settings:
-  - naam wijzigen
-  - PIN wijzigen
-  - deel-link kopiëren
-  - schema aanpassen (oefening toevoegen/verwijderen/herordenen)
-  - JSON export
+  - change name
+  - change PIN
+  - copy share link
+  - edit program (add/remove/reorder exercises)
+  - export JSON
 - Offline:
   - service worker caching
-  - offline write queue in frontend met sync bij reconnect
+  - offline write queue in frontend with reconnect sync
 
 ## API Endpoints
 
@@ -90,9 +88,9 @@ GET    /api/share/:token
 GET    /api/progress/:exercise_id
 ```
 
-## Lokaal Ontwikkelen
+## Local Development
 
-Vereisten:
+Requirements:
 - Node.js 20+
 - npm
 - Wrangler CLI (`npm i -g wrangler`)
@@ -100,15 +98,15 @@ Vereisten:
 ### 1) Database
 
 ```bash
-# vanuit repo root
+# from repo root
 npx wrangler d1 create acl-rehab-db
-# zet database_id in worker/wrangler.toml
+# set database_id in worker/wrangler.toml
 
 npx wrangler d1 execute acl-rehab-db --local --file=./schema.sql
 npx wrangler d1 execute acl-rehab-db --local --file=./seed.sql
 ```
 
-### 2) Worker lokaal
+### 2) Run Worker locally
 
 ```bash
 cd worker
@@ -116,7 +114,7 @@ npm ci
 npx wrangler dev
 ```
 
-### 3) Frontend lokaal
+### 3) Run Frontend locally
 
 ```bash
 cd frontend
@@ -124,7 +122,7 @@ npm ci
 npm run dev
 ```
 
-## Handmatige Deployment
+## Manual Deployment
 
 ```bash
 # Worker
@@ -137,42 +135,50 @@ npm run build
 npx wrangler pages deploy dist --project-name=acl-rehab-app
 ```
 
-## Automatische Deployment via GitHub Actions
+## Automatic Deployment (GitHub Actions)
 
 Workflow:
 - `.github/workflows/cloudflare-deploy.yml`
-- Trigger: elke push naar `main` (en handmatig via `workflow_dispatch`)
-- Deployt zowel Worker als Pages
+- Trigger: every push to `main` (and manual `workflow_dispatch`)
+- Deploys both Worker and Pages
 
-### Benodigde GitHub Secrets
+### Required GitHub Secrets
 
-Stel in op repo-niveau (`Settings -> Secrets and variables -> Actions`):
+Set these at repository level (`Settings -> Secrets and variables -> Actions`):
 
 - `CLOUDFLARE_API_TOKEN`
-  - Token met minimaal:
+  - minimum scopes:
     - Workers Scripts: Edit
     - Cloudflare Pages: Edit
     - D1: Edit
 - `CLOUDFLARE_ACCOUNT_ID`
 
-Zodra deze secrets staan, wordt elke push naar `main` automatisch gedeployed.
+Once set, each push to `main` automatically deploys.
 
-## Oefeningillustraties
+## Exercise Illustrations
 
-- wger-afbeeldingen gecached als statische assets onder:
+- wger images cached as static assets in:
   - `frontend/public/images/wger/`
-- fallback SVG’s voor oefeningen zonder match
-- attributie:
+- SVG fallback images for exercises without a wger match
+- attribution:
   - `frontend/public/images/wger/ATTRIBUTION.md`
 
-## Security Notities
+## Security Notes
 
-- PIN wordt gehashed opgeslagen (SHA-256).
-- CORS is beperkt tot eigen Pages domein + localhost.
-- Basis rate-limiting op auth endpoints aanwezig in Worker.
+- PINs are stored as SHA-256 hashes.
+- CORS is restricted to the app domain and localhost.
+- Basic auth endpoint rate limiting is implemented in the Worker.
 
-## Bekende Beperkingen
+## Known Limitations
 
-- Rate limiting is momenteel in-memory (per isolate), niet distributed persistent.
-- Offline queue is client-side; conflict-resolutie is basic (best-effort replay).
+- Rate limiting is currently in-memory (per isolate), not globally distributed.
+- Offline queue sync is client-side best-effort replay.
 
+## Public Repository Safety
+
+This repository must not contain secrets or personal/private information.
+Do not commit:
+- API tokens
+- account IDs outside required env/secrets references
+- private URLs, emails, or credentials
+- `.env` files with sensitive values
