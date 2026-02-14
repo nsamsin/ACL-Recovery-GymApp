@@ -26,11 +26,14 @@ const en = {
   // Login
   welcomeBack: "Welcome back!",
   setupPrompt: "Set up your name and PIN",
+  loginPrompt: "Log in with your name and PIN",
   name: "Name",
   pin4: "PIN (4 digits)",
   busy: "Loading...",
   logIn: "Log in",
   createAccount: "Create account",
+  haveAccount: "Already have an account? Log in",
+  noAccount: "No account yet? Create one",
 
   // Dashboard
   welcome: "Welcome,",
@@ -150,11 +153,14 @@ const nl = {
 
   welcomeBack: "Welkom terug!",
   setupPrompt: "Stel je naam en PIN in",
+  loginPrompt: "Log in met je naam en PIN",
   name: "Naam",
   pin4: "PIN (4 cijfers)",
   busy: "Bezig...",
   logIn: "Inloggen",
   createAccount: "Account maken",
+  haveAccount: "Al een account? Inloggen",
+  noAccount: "Nog geen account? Maak er een",
 
   welcome: "Welkom,",
   nextSession: "Volgende sessie:",
